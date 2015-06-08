@@ -302,7 +302,7 @@ class PaymentGateway( APIObject ):
     def redact( self ):
         '''Redact sensitive information in payment gateway.
         '''
-        req = spreedlycore.APIRequest(
+        req = APIRequest(
             self.api, 'gateways/%s/redact.xml' % self.token, 'PUT', '')
         self.from_dict(xml_to_dict(req.xml().find('gateway')))
         return self
@@ -544,7 +544,7 @@ class Transaction( APIObject ):
     def load( self ):
         '''Load transaction from Spreedly.
         '''
-        spreedlycore.APIRequest(self.api, 'transactions/%s.xml' % self.token, data = '').to_object(Transaction, target = self )
+        APIRequest(self.api, 'transactions/%s.xml' % self.token, data = '').to_object(Transaction, target = self )
         return self
 
     def from_dict( self, data ):
