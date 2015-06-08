@@ -299,6 +299,15 @@ class PaymentGateway( APIObject ):
                 data = data.pop( 'gateway' )
             super( PaymentGateway, self ).from_dict( data )
 
+    def redact( self ):
+        '''Redact sensitive information in payment gateway.
+        '''
+        req = spreedlycore.APIRequest(
+            self.api, 'gateways/%s/redact.xml' % self.token, 'PUT', '')
+        self.from_dict(xml_to_dict(req.xml().find('gateway')))
+        return self
+
+
 class PaymentMethod( APIObject ):
     @classmethod
     def add( cls, api, credit_card ):
@@ -418,7 +427,7 @@ class Transaction( APIObject ):
 
 
     @classmethod
-    def purchase( cls, api, pg, pm, amount, currency, order_id = None, ip = None, description = None ):
+    def purchase( cls, api, pg, pm, amount, currency, order_id = None, ip = None, description = None, retain_on_success = False, callback_url = '', redirect_url = '' ):
         '''
             Works just like the add method except no funds are actually transfered.
             Use capture method to make the actual transfer or void method to cancel it.
@@ -436,13 +445,19 @@ class Transaction( APIObject ):
             data['transaction']['ip'] = ip
         if description:
             data['transaction']['description'] = description
+        if callback_url:
+            data['transaction']['callback_url'] = callback_url
+        if redirect_url:
+            data['transaction']['redirect_url'] = redirect_url
+        if retain_on_success:
+            data['transaction']['retain_on_success'] = 'true'
 
         data = dict_to_xml( data )
 
         return APIRequest( api, 'gateways/%s/purchase.xml' % pg.token, 'POST', data ).to_object( Transaction )
 
     @classmethod
-    def authorize( cls, api, pg, pm, amount, currency, order_id = None, ip = None, description = None ):
+    def authorize( cls, api, pg, pm, amount, currency, order_id = None, ip = None, description = None, callback_url = '', redirect_url = '' ):
         '''
             Works just like the add method except no funds are actually transfered.
             Use capture method to make the actual transfer or void method to cancel it.
@@ -460,6 +475,10 @@ class Transaction( APIObject ):
             data['transaction']['ip'] = ip
         if description:
             data['transaction']['description'] = description
+        if callback_url:
+            data['transaction']['callback_url'] = callback_url
+        if redirect_url:
+            data['transaction']['redirect_url'] = redirect_url
 
         data = dict_to_xml( data )
 
@@ -521,6 +540,12 @@ class Transaction( APIObject ):
             data = ''
 
         return APIRequest( self.api, 'transactions/%s/credit.xml' % self.token, 'POST', '' ).to_object( Transaction, target = self )
+
+    def load( self ):
+        '''Load transaction from Spreedly.
+        '''
+        spreedlycore.APIRequest(self.api, 'transactions/%s.xml' % self.token, data = '').to_object(Transaction, target = self )
+        return self
 
     def from_dict( self, data ):
         data = data.pop( 'transaction' )
