@@ -457,7 +457,7 @@ class Transaction( APIObject ):
         return APIRequest( api, 'gateways/%s/purchase.xml' % pg.token, 'POST', data ).to_object( Transaction )
 
     @classmethod
-    def authorize( cls, api, pg, pm, amount, currency, order_id = None, ip = None, description = None, callback_url = '', redirect_url = '' ):
+    def authorize( cls, api, pg, pm, amount, currency, order_id = None, ip = None, description = None, retain_on_success = False, callback_url = '', redirect_url = '' ):
         '''
             Works just like the add method except no funds are actually transfered.
             Use capture method to make the actual transfer or void method to cancel it.
@@ -479,6 +479,8 @@ class Transaction( APIObject ):
             data['transaction']['callback_url'] = callback_url
         if redirect_url:
             data['transaction']['redirect_url'] = redirect_url
+        if retain_on_success:
+            data['transaction']['retain_on_success'] = 'true'
 
         data = dict_to_xml( data )
 
