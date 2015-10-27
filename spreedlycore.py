@@ -8,7 +8,7 @@ from xmlutils import xml_to_dict, dict_to_xml
 
 class APIConnection( object ):
     def __init__( self, login, secret, base_url = None ):
-        self.base_url = base_url or 'https://spreedlycore.com/v1/'
+        self.base_url = base_url or 'https://core.spreedly.com/v1/'
         self.login = login
         self.secret = secret
 
