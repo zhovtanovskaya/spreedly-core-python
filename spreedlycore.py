@@ -541,7 +541,7 @@ class Transaction( APIObject ):
         else:
             data = ''
 
-        return APIRequest( self.api, 'transactions/%s/credit.xml' % self.token, 'POST', '' ).to_object( Transaction, target = self )
+        return APIRequest( self.api, 'transactions/%s/credit.xml' % self.token, 'POST', data ).to_object( Transaction, target = self )
 
     def load( self ):
         '''Load transaction from Spreedly.
